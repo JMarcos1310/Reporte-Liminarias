@@ -1,0 +1,50 @@
+
+
+@section('content')
+    <div class="container">
+        <h1>Crear Petición (Servidor Público)</h1>
+        <form action="{{ route('servidor_publico.peticiones.store') }}" method="POST">
+            @csrf
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre Completo</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required>
+            </div>
+            <div class="mb-3">
+                <label for="comunidad_id" class="form-label">Comunidad</label>
+                <select class="form-select" id="comunidad_id" name="comunidad_id" required>
+                    @foreach($comunidades as $comunidad)
+                        <option value="{{ $comunidad->id }}">{{ $comunidad->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="tipo_servicio_id" class="form-label">Tipo de Servicio</label>
+                <select class="form-select" id="tipo_servicio_id" name="tipo_servicio_id" required>
+                    @foreach($tiposServicio as $tipoServicio)
+                        <option value="{{ $tipoServicio->id }}">{{ $tipoServicio->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="observaciones" class="form-label">Observaciones</label>
+                <textarea class="form-control" id="observaciones" name="observaciones" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Número de Teléfono</label>
+                <input type="text" class="form-control" id="telefono" name="telefono">
+            </div>
+            <div class="mb-3">
+                <label for="direccion" class="form-label">Dirección</label>
+                <input type="text" class="form-control" id="direccion" name="direccion">
+            </div>
+            <div class="mb-3">
+                <label for="colonia" class="form-label">Colonia</label>
+                <input type="text" class="form-control" id="colonia" name="colonia">
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form>
+    </div>
