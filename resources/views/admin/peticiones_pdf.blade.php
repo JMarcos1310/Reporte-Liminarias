@@ -2,22 +2,6 @@
 <html>
 <head>
     <title>Reporte de Peticiones</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-    </style>
 </head>
 <body>
     <h1>Reporte de Peticiones</h1>
