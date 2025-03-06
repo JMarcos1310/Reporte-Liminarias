@@ -10,134 +10,143 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Ruta para crear peticiones
-Route::get('/peticiones/create', function () {
-    $comunidades = DB::table('comunidades')->get();
-    $tiposServicio = DB::table('tipos_servicio')->get();
-    return view('peticiones.create', compact('comunidades', 'tiposServicio'));
+// Rutas para peticiones
+Route::prefix('peticiones')->group(function () {
+    // Ruta para mostrar el formulario de creación de peticiones
+    Route::get('/create', function () {
+        $comunidades = DB::table('comunidades')->get();
+        $tiposServicio = DB::table('tipos_servicio')->get();
+        return view('peticiones.create', compact('comunidades', 'tiposServicio'));
+    })->name('peticiones.create');
+
+    // Ruta para guardar peticiones
+    Route::post('/store', function () {
+        $data = request()->all();
+        $numeroSolicitud = 'SOL-' . uniqid();
+
+        DB::table('peticiones')->insert([
+            'nombre' => $data['nombre'],
+            'tipo_servicio_id' => $data['tipo_servicio_id'],
+            'comunidad_id' => $data['comunidad_id'],
+            'observaciones' => $data['observaciones'],
+            'email' => $data['email'],
+            'telefono' => $data['telefono'],
+            'direccion' => $data['direccion'],
+            'colonia' => $data['colonia'],
+            'numero_solicitud' => $numeroSolicitud,
+            'estatus' => 'pendiente',
+            'created_at' => now(),
+        ]);
+
+        // Enviar correo electrónico
+        Mail::raw("Gracias por su solicitud. Su número de solicitud es: $numeroSolicitud", function ($message) use ($data) {
+            $message->to($data['email'])
+                    ->subject('Número de Solicitud');
+        });
+
+        return redirect('/peticiones/create')->with('success', 'Solicitud enviada correctamente.');
+    })->name('peticiones.store');
 });
 
-// Ruta para guardar peticiones
-Route::post('/peticiones/store', function () {
-    $data = request()->all();
-    $numeroSolicitud = 'SOL-' . uniqid();
+// Rutas para el administrador
+Route::prefix('admin')->group(function () {
+    // Dashboard del administrador
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
 
-    // Insertar la petición en la base de datos
-    DB::table('peticiones')->insert([
-        'nombre' => $data['nombre'],
-        'tipo_servicio_id' => $data['tipo_servicio_id'],
-        'comunidad_id' => $data['comunidad_id'],
-        'observaciones' => $data['observaciones'],
-        'email' => $data['email'],
-        'telefono' => $data['telefono'],
-        'direccion' => $data['direccion'],
-        'colonia' => $data['colonia'],
-        'numero_solicitud' => $numeroSolicitud,
-        'estatus' => 'pendiente',
-        'created_at' => now(),
-    ]);
+    // Listado de peticiones
+    Route::get('/peticiones', function () {
+        $peticiones = DB::table('peticiones')->get();
+        return view('admin.peticiones', compact('peticiones'));
+    })->name('admin.peticiones');
 
-    // Enviar correo electrónico
-    Mail::raw("Gracias por su solicitud. Su número de solicitud es: $numeroSolicitud", function ($message) use ($data) {
-        $message->to($data['email'])
-                ->subject('Número de Solicitud');
-    });
+    // Generar PDF de peticiones
+    Route::get('/peticiones/pdf', function () {
+        $peticiones = DB::table('peticiones')->get();
+        $pdf = Pdf::loadView('admin.peticiones_pdf', compact('peticiones'));
+        return $pdf->download('peticiones.pdf');
+    })->name('admin.peticiones.pdf');
+});
 
-    return redirect('/peticiones/create')->with('success', 'Solicitud enviada correctamente.');
-})->name('peticiones.store');
+// Rutas para el servidor público
+Route::prefix('servidor/publico')->group(function () {
+    // Dashboard del servidor público
+    Route::get('/dashboard', function () {
+        return view('servidor_publico.dashboard');
+    })->name('servidor_publico.dashboard');
 
-// Ruta para el dashboard del administrador
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-})->name('admin.dashboard');
+    // Listado de peticiones
+    Route::get('/peticiones', function () {
+        $peticiones = DB::table('peticiones')->get();
+        return view('servidor_publico.peticiones', compact('peticiones'));
+    })->name('servidor_publico.peticiones');
 
-// Ruta para ver peticiones (admin)
-Route::get('/admin/peticiones', function () {
-    $peticiones = DB::table('peticiones')->get();
-    return view('admin.peticiones', compact('peticiones'));
-})->name('admin.peticiones');
+    // Formulario de creación de peticiones
+    Route::get('/peticiones/create', function () {
+        $comunidades = DB::table('comunidades')->get();
+        $tiposServicio = DB::table('tipos_servicio')->get();
+        return view('servidor_publico.peticiones_create', compact('comunidades', 'tiposServicio'));
+    })->name('servidor_publico.peticiones.create');
 
-// Ruta para generar PDF de peticiones (admin)
-Route::get('/admin/peticiones/pdf', function () {
-    $peticiones = DB::table('peticiones')->get();
-    $pdf = Pdf::loadView('admin.peticiones_pdf', compact('peticiones'));
-    return $pdf->download('peticiones.pdf');
-})->name('admin.peticiones.pdf');
+    // Guardar peticiones
+    Route::post('/peticiones/store', function () {
+        $data = request()->all();
+        $numeroSolicitud = 'SOL-' . uniqid();
 
+        DB::table('peticiones')->insert([
+            'nombre' => $data['nombre'],
+            'tipo_servicio_id' => $data['tipo_servicio_id'],
+            'comunidad_id' => $data['comunidad_id'],
+            'observaciones' => $data['observaciones'],
+            'email' => $data['email'],
+            'telefono' => $data['telefono'],
+            'direccion' => $data['direccion'],
+            'colonia' => $data['colonia'],
+            'numero_solicitud' => $numeroSolicitud,
+            'estatus' => 'pendiente',
+            'created_at' => now(),
+        ]);
 
+        // Enviar correo electrónico
+        Mail::raw("Gracias por su solicitud. Su número de solicitud es: $numeroSolicitud", function ($message) use ($data) {
+            $message->to($data['email'])
+                    ->subject('Número de Solicitud');
+        });
 
-Route::get('/admin/peticiones/pdf', function () {
-    $peticiones = DB::table('peticiones')->get();
-    $pdf = Pdf::loadView('admin.peticiones_pdf', compact('peticiones'));
-    return $pdf->download('peticiones.pdf');
-})->name('admin.peticiones.pdf');
+        return redirect('/servidor/publico/peticiones/create')->with('success', 'Solicitud enviada correctamente.');
+    })->name('servidor_publico.peticiones.store');
+});
 
-// Ruta para el dashboard del servidor público
-Route::get('/servidor/publico/dashboard', function () {
-    return view('servidor_publico.dashboard');
-})->name('servidor_publico.dashboard');
+// Rutas para servidores públicos (registro)
+Route::prefix('servidores_publicos')->group(function () {
+    // Guardar servidores públicos
+    Route::post('/store', function () {
+        $data = request()->all();
+        $numeroSolicitud = 'SOL-' . uniqid();
 
-// Ruta para ver peticiones (servidor público)
-Route::get('/servidor/publico/peticiones', function () {
-    $peticiones = DB::table('peticiones')->get();
-    return view('servidor_publico.peticiones', compact('peticiones'));
-})->name('servidor_publico.peticiones');
+        DB::table('servidores_publicos')->insert([
+            'nombre' => $data['nombre'],
+            'comunidad_id' => $data['comunidad_id'],
+            'area_departamento' => $data['area_departamento'],
+            'observaciones' => $data['observaciones'],
+            'email' => $data['email'],
+            'direccion' => $data['direccion'],
+            'colonia' => $data['colonia'],
+            'numero_solicitud' => $numeroSolicitud,
+            'estatus' => 'pendiente',
+            'created_at' => now(),
+        ]);
 
+        return redirect('/servidores_publicos/create')->with('success', 'Servidor público registrado correctamente.');
+    })->name('servidores_publicos.store');
+});
 
-// Ruta para mostrar el formulario de creación de peticiones (servidor público)
-Route::get('/servidor/publico/peticiones/create', function () {
+Route::get('/servidores_publicos/create', function () {
     $comunidades = DB::table('comunidades')->get();
-    $tiposServicio = DB::table('tipos_servicio')->get();
-    return view('servidor_publico.peticiones_create', compact('comunidades', 'tiposServicio'));
-})->name('servidor_publico.peticiones.create');
+    return view('servidores_publicos.create', compact('comunidades'));
+})->name('servidores_publicos.create');
 
-// Ruta para guardar peticiones (servidor público)
-Route::post('/servidor/publico/peticiones/store', function () {
-    $data = request()->all();
-    $numeroSolicitud = 'SOL-' . uniqid();
-
-    // Insertar la petición en la base de datos
-    DB::table('peticiones')->insert([
-        'nombre' => $data['nombre'],
-        'tipo_servicio_id' => $data['tipo_servicio_id'],
-        'comunidad_id' => $data['comunidad_id'],
-        'observaciones' => $data['observaciones'],
-        'email' => $data['email'],
-        'telefono' => $data['telefono'],
-        'direccion' => $data['direccion'],
-        'colonia' => $data['colonia'],
-        'numero_solicitud' => $numeroSolicitud,
-        'estatus' => 'pendiente',
-        'created_at' => now(),
-    ]);
-
-    // Enviar correo electrónico
-    Mail::raw("Gracias por su solicitud. Su número de solicitud es: $numeroSolicitud", function ($message) use ($data) {
-        $message->to($data['email'])
-                ->subject('Número de Solicitud');
-    });
-
-    return redirect('/servidor/publico/peticiones/create')->with('success', 'Solicitud enviada correctamente.');
-})->name('servidor_publico.peticiones.store');
-
-
-Route::post('/servidores_publicos/store', function () {
-    $data = request()->all();
-    $numeroSolicitud = 'SOL-' . uniqid();
-
-    // Insertar el servidor público en la base de datos
-    DB::table('servidores_publicos')->insert([
-        'nombre' => $data['nombre'],
-        'comunidad_id' => $data['comunidad_id'],
-        'area_departamento' => $data['area_departamento'],
-        'observaciones' => $data['observaciones'],
-        'email' => $data['email'],
-        'direccion' => $data['direccion'],
-        'colonia' => $data['colonia'],
-        'numero_solicitud' => $numeroSolicitud,
-        'estatus' => 'pendiente',
-        'created_at' => now(),
-    ]);
-
-    return redirect('/servidores_publicos/create')->with('success', 'Servidor público registrado correctamente.');
-})->name('servidores_publicos.store');
+Route::get('/servidores_publicos/create', function () {
+    return view('servidor_publico.peticiones_create');
+})->name('servidores_publicos.create');
