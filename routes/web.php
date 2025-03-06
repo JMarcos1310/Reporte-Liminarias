@@ -119,3 +119,25 @@ Route::post('/servidor/publico/peticiones/store', function () {
 
     return redirect('/servidor/publico/peticiones/create')->with('success', 'Solicitud enviada correctamente.');
 })->name('servidor_publico.peticiones.store');
+
+
+Route::post('/servidores_publicos/store', function () {
+    $data = request()->all();
+    $numeroSolicitud = 'SOL-' . uniqid();
+
+    // Insertar el servidor público en la base de datos
+    DB::table('servidores_publicos')->insert([
+        'nombre' => $data['nombre'],
+        'comunidad_id' => $data['comunidad_id'],
+        'area_departamento' => $data['area_departamento'],
+        'observaciones' => $data['observaciones'],
+        'email' => $data['email'],
+        'direccion' => $data['direccion'],
+        'colonia' => $data['colonia'],
+        'numero_solicitud' => $numeroSolicitud,
+        'estatus' => 'pendiente',
+        'created_at' => now(),
+    ]);
+
+    return redirect('/servidores_publicos/create')->with('success', 'Servidor público registrado correctamente.');
+})->name('servidores_publicos.store');

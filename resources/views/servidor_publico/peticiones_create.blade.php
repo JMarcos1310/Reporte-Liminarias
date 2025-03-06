@@ -6,15 +6,14 @@
     <title>Document</title>
 </head>
 <body>
-    
 
 @section('content')
     <div class="container">
-        <h1>Crear Petición (Servidor Público)</h1>
-        <form action="{{ route('servidor_publico.peticiones.store') }}" method="POST">
+        <h1>Registrar Servidor Público</h1>
+        <form action="{{ route('servidores_publicos.store') }}" method="POST">
             @csrf
             <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre Completo</label>
+                <label for="nombre" class="form-label">Nombre</label>
                 <input type="text" class="form-control" id="nombre" name="nombre" required>
             </div>
             <div class="mb-3">
@@ -26,12 +25,8 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label for="tipo_servicio_id" class="form-label">Tipo de Servicio</label>
-                <select class="form-select" id="tipo_servicio_id" name="tipo_servicio_id" required>
-                    @foreach($tiposServicio as $tipoServicio)
-                        <option value="{{ $tipoServicio->id }}">{{ $tipoServicio->nombre }}</option>
-                    @endforeach
-                </select>
+                <label for="area_departamento" class="form-label">Área/Departamento</label>
+                <input type="text" class="form-control" id="area_departamento" name="area_departamento" required>
             </div>
             <div class="mb-3">
                 <label for="observaciones" class="form-label">Observaciones</label>
@@ -42,10 +37,6 @@
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
             <div class="mb-3">
-                <label for="telefono" class="form-label">Número de Teléfono</label>
-                <input type="text" class="form-control" id="telefono" name="telefono">
-            </div>
-            <div class="mb-3">
                 <label for="direccion" class="form-label">Dirección</label>
                 <input type="text" class="form-control" id="direccion" name="direccion">
             </div>
@@ -53,7 +44,7 @@
                 <label for="colonia" class="form-label">Colonia</label>
                 <input type="text" class="form-control" id="colonia" name="colonia">
             </div>
-            <button type="submit" class="btn btn-primary">Enviar</button>
+            <button type="submit" class="btn btn-primary">Registrar</button>
         </form>
     </div>
 
