@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-
+<h2></h2>
 @section('content')
     <div class="container">
         <h1>Registrar Servidor Público</h1>
