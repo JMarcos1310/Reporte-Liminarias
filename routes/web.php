@@ -150,3 +150,18 @@ Route::get('/servidores_publicos/create', function () {
 Route::get('/servidores_publicos/create', function () {
     return view('servidor_publico.peticiones_create');
 })->name('servidores_publicos.create');
+
+
+Route::get('/servidores_publicos/create', function () {
+    $comunidades = DB::table('comunidades')->get();
+    return view('servidores_publicos.create', compact('comunidades'));
+})->name('servidores_publicos.create');
+
+Route::get('/servidores_publicos/create', function () {
+    return view('servidor_publico.peticiones_create');
+})->name('servidores_publicos.create');
+
+Route::get('/servidores_publicos/create', function () {
+    $comunidades = DB::table('comunidades')->get();
+    return view('servidor_publico.peticiones_create', compact('comunidades'));
+})->name('servidores_publicos.create');
